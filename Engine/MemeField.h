@@ -24,9 +24,11 @@ private:
 		bool IsRevealed() const;
 		void ToggleFlag();
 		bool Flagged() const;
+		void SetNeighboursMemeCount(int memeCount);
 	private:
 		State state = State::Hidden;
 		bool hasMeme = false;
+		int nNeigbourMemes = -1;
 	};
 public:
 	MemeField(int nMemes);
@@ -38,6 +40,7 @@ private:
 	Tile& TileAt(const Vei2 gridPos);
 	const Tile& TileAt(const Vei2 gridPos) const;
 	Vei2 ScreenToGrid(const Vei2& screenPos);
+	int CountNeghbourMemes(const Vei2& gridPos);
 private:
 	static constexpr int width = 20;
 	static constexpr int height = 16;

@@ -1,4 +1,5 @@
 #include "SpriteCodex.h"
+#include "MemeField.h"
 #include <assert.h>
 
 void SpriteCodex::DrawTile0( const Vei2& pos,Graphics& gfx )

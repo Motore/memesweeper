@@ -29,7 +29,7 @@ private:
 		int nNeighborMemes = -1;
 	};
 public:
-	MemeField( int nMemes );
+	MemeField(const Vei2& center, int nMemes);
 	void Draw( Graphics& gfx ) const;
 	RectI GetRect() const;
 	void OnRevealClick( const Vei2& screenPos );
@@ -40,8 +40,11 @@ private:
 	Vei2 ScreenToGrid( const Vei2& screenPos );
 	int CountNeighborMemes( const Vei2& gridPos );
 private:
-	static constexpr int width = 20;
-	static constexpr int height = 16;
+	static constexpr int width = 4;
+	static constexpr int height = 4;
+	Vei2 topLeft;
+	static constexpr int halfWidth = width / 2;
+	static constexpr int halfHeight = height / 2;
 	bool isFucked = false;
 	Tile field[width * height];
 };

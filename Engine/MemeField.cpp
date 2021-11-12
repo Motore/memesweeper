@@ -13,27 +13,68 @@ bool MemeField::Tile::HasMeme() const
 	return hasMeme;
 }
 
-void MemeField::Tile::Draw(const Vei2& screenPos, Graphics& gfx) const
+void MemeField::Tile::Draw(const Vei2& screenPos, bool fucked, Graphics& gfx) const
 {
-	switch (state) 
+	if (!fucked)
 	{
-	case State::Hidden:
-		SpriteCodex::DrawTileButton(screenPos, gfx);
-		break;
-	case State::Flagged:
-		SpriteCodex::DrawTileButton(screenPos, gfx);
-		SpriteCodex::DrawTileFlag(screenPos, gfx);
-		break;
-	case State::Revealed:
-		if (!HasMeme())
+		switch (state)
 		{
-			SpriteCodex::DrawTileNumber(screenPos, nNeigbourMemes, gfx);
+		case State::Hidden:
+			SpriteCodex::DrawTileButton(screenPos, gfx);
+			break;
+		case State::Flagged:
+			SpriteCodex::DrawTileButton(screenPos, gfx);
+			SpriteCodex::DrawTileFlag(screenPos, gfx);
+			break;
+		case State::Revealed:
+			if (!HasMeme())
+			{
+				SpriteCodex::DrawTileNumber(screenPos, nNeigbourMemes, gfx);
+			}
+			else
+			{
+				SpriteCodex::DrawTileBomb(screenPos, gfx);
+			}
+			break;
 		}
-		else
+	}
+	else // we are fucked
+	{
+		switch (state)
 		{
-			SpriteCodex::DrawTileBomb(screenPos, gfx);
+		case State::Hidden:
+			if (HasMeme())
+			{
+				SpriteCodex::DrawTileBomb(screenPos, gfx);
+			}
+			else
+			{
+				SpriteCodex::DrawTileButton(screenPos, gfx);
+			}
+			break;
+		case State::Flagged:
+			if (HasMeme())
+			{
+				SpriteCodex::DrawTileBomb(screenPos, gfx);
+				SpriteCodex::DrawTileFlag(screenPos, gfx);
+			}
+			else
+			{
+				SpriteCodex::DrawTileButton(screenPos, gfx);
+				SpriteCodex::DrawTileCross(screenPos, gfx);
+			}
+			break;
+		case State::Revealed:
+			if (!HasMeme())
+			{
+				SpriteCodex::DrawTileNumber(screenPos, nNeigbourMemes, gfx);
+			}
+			else
+			{
+				SpriteCodex::DrawTileBombRed(screenPos, gfx);
+			}
+			break;
 		}
-		break;
 	}
 }
 
@@ -101,7 +142,7 @@ void MemeField::Draw(Graphics& gfx) const
 	{
 		for (gridPos.x = 0; gridPos.x < width; ++gridPos.x)
 		{
-			TileAt(gridPos).Draw(gridPos * SpriteCodex::tileSize, gfx);
+			TileAt(gridPos).Draw(gridPos * SpriteCodex::tileSize, isFucked, gfx);
 		}
 	}
 }
@@ -113,23 +154,33 @@ RectI MemeField::GetRect() const
 
 void MemeField::OnRevealClick(const Vei2& screenPos)
 {
-	const Vei2 gridPos = ScreenToGrid(screenPos);
-	assert(gridPos.x > 0 && gridPos.x < width&& gridPos.y > 0 && gridPos.y < height);
-	Tile& tile = TileAt(gridPos);
-	if (!tile.IsRevealed() && !tile.Flagged())
+	if (!isFucked)
 	{
-		tile.Reveal();
+		const Vei2 gridPos = ScreenToGrid(screenPos);
+		assert(gridPos.x >= 0 && gridPos.x < width&& gridPos.y >= 0 && gridPos.y < height);
+		Tile& tile = TileAt(gridPos);
+		if (!tile.IsRevealed() && !tile.Flagged())
+		{
+			tile.Reveal();
+			if (tile.HasMeme())
+			{
+				isFucked = true;
+			}
+		}
 	}
 }
 
 void MemeField::OnFlagClick(const Vei2& screenPos)
 {
-	const Vei2 gridPos = ScreenToGrid(screenPos);
-	assert(gridPos.x > 0 && gridPos.x < width&& gridPos.y > 0 && gridPos.y < height);
-	Tile& tile = TileAt(gridPos);
-	if (!tile.Flagged() && !tile.IsRevealed())
+	if (!isFucked)
 	{
-		tile.ToggleFlag();
+		const Vei2 gridPos = ScreenToGrid(screenPos);
+		assert(gridPos.x >= 0 && gridPos.x < width&& gridPos.y >= 0 && gridPos.y < height);
+		Tile& tile = TileAt(gridPos);
+		if (!tile.Flagged() && !tile.IsRevealed())
+		{
+			tile.ToggleFlag();
+		}
 	}
 }
 

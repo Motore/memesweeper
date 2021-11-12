@@ -45,12 +45,18 @@ void Game::UpdateModel()
 		if (e.GetType() == Mouse::Event::Type::LPress)
 		{
 			const Vei2 mousePos = wnd.mouse.GetPos();
-			field.OnRevealClick(mousePos);
+			if (field.GetRect().Contains(mousePos))
+			{
+				field.OnRevealClick(mousePos);
+			}
 		}
 		else if (e.GetType() == Mouse::Event::Type::RPress)
 		{
 			const Vei2 mousePos = wnd.mouse.GetPos();
-			field.OnFlagClick(mousePos);
+			if (field.GetRect().Contains(mousePos))
+			{
+				field.OnFlagClick(mousePos);
+			}
 		}
 	}
 }
